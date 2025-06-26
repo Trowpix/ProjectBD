@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.Project.scenes.guru.JadwalKelasController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- Header with Close Button -->
+    <HBox alignment="CENTER" spacing="20.0">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Jadwal Kelas Guru" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Schedule Card -->
+    <VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+        <!-- Schedule Table -->
+        <TableView fx:id="scheduleTable" prefHeight="350.0" prefWidth="892.0">
+            <columns>
+                <TableColumn fx:id="waktuColumn" prefWidth="120" style="-fx-font-weight: bold;" text="Waktu" />
+                <TableColumn fx:id="seninColumn" prefWidth="148.0000457763672" text="Senin" />
+                <TableColumn fx:id="selasaColumn" prefWidth="140.0" text="Selasa" />
+                <TableColumn fx:id="rabuColumn" prefWidth="134.39996337890625" text="Rabu" />
+                <TableColumn fx:id="kamisColumn" minWidth="0.0" prefWidth="177.5999755859375" text="Kamis" />
+                <TableColumn fx:id="jumatColumn" prefWidth="172.00006103515625" text="Jumat" />
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- Back Button -->
+    <HBox alignment="CENTER" style="-fx-padding: 20 0 0 0;">
+        <Button onAction="#onKembaliClicked" style="-fx-font-size: 14px; -fx-pref-width: 120px; -fx-pref-height: 35px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;" text="Kembali" />
+    </HBox>
+</VBox>
