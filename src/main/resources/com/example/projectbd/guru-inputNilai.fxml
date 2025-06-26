@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="TOP_CENTER" spacing="18.0" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.guru.InputNilaiController">
+    <padding>
+        <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER" spacing="20.0">
+        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Input Nilai Mata Pelajaran" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Info Mata Pelajaran & Kelas -->
+    <GridPane hgap="18" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 0);" vgap="8">
+        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Mata Pelajaran:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <ComboBox fx:id="mapelComboBox" prefWidth="200" promptText="Pilih Mata Pelajaran" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Kelas:" GridPane.rowIndex="3" />
+        <ComboBox fx:id="kelasComboBox" prefWidth="120" promptText="Pilih Kelas" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Button onAction="#onTampilkanSiswaClicked" style="-fx-font-size: 14px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Tampilkan Siswa" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.rowSpan="2" />
+        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Semester:" GridPane.rowIndex="2" />
+        <ComboBox fx:id="semesterComboBox" prefWidth="120" promptText="Pilih Semester" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+            <ColumnConstraints />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+        </rowConstraints>
+    </GridPane>
+
+    <!-- Input Nilai Siswa (NIS Dropdown) -->
+    <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 0);">
+        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Input Nilai Siswa" />
+        <GridPane hgap="15" vgap="12">
+            <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Pilih NIS Siswa:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <ComboBox fx:id="nisComboBox" onAction="#onNisPicked" onDragExited="#onNisPicked" onMouseClicked="#onKelasPicked" onMouseExited="#onNisPicked" prefWidth="180" promptText="Pilih NIS" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label style="-fx-font-size: 15px; -fx-text-fill: #34495e;" text="Nama Siswa:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label fx:id="namaSiswaLabel" style="-fx-font-size: 15px; -fx-text-fill: #2c3e50;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label style="-fx-font-size: 15px; -fx-text-fill: #34495e;" text="UTS:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="utsTextField" promptText="Masukkan Nilai UTS" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label style="-fx-font-size: 15px; -fx-text-fill: #34495e;" text="UAS:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="uasTextField" promptText="Masukkan Nilai UAS" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Button onAction="#onSimpanNilaiClicked" style="-fx-font-size: 16px; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-pref-width: 200px;" text="Simpan Nilai" />
+        </HBox>
+    </VBox>
+
+    <!-- Keterangan Guru -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label fx:id="guruNameLabel" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;" text="Guru: Nama Guru" />
+    </HBox>
+
+    <!-- Back Button -->
+    <HBox alignment="CENTER" style="-fx-padding: 18 0 0 0;">
+        <Button onAction="#onKembaliClicked" style="-fx-font-size: 14px; -fx-pref-width: 120px; -fx-pref-height: 35px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;" text="Kembali" />
+    </HBox>
+</VBox>
