@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER" prefWidth="600.0" spacing="25.0" style="-fx-background-color: linear-gradient(to bottom right, #dfe6e9, #b2bec3);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.siswa.SiswaViewController">
+
+   <padding>
+      <Insets bottom="25" left="40" right="40" top="25" />
+   </padding>
+
+   <!-- Header -->
+   <HBox alignment="CENTER_LEFT" spacing="15">
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3436;" text="Dashboard Siswa" />
+   </HBox>
+
+   <!-- Content Card -->
+   <VBox alignment="CENTER" prefWidth="500" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 20;                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 20, 0.1, 0, 4); -fx-padding: 35;">
+
+      <Label fx:id="nameLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3436;" text="Selamat Datang, Siswa!" />
+
+      <Separator prefWidth="400.0" style="-fx-background-color: #dcdde1;" />
+
+      <VBox alignment="CENTER" spacing="15.0">
+         <!-- Tombol dengan efek hover -->
+         <Button fx:id="biodataButton" onAction="#onBiodataButtonClicked" prefHeight="25.0" prefWidth="114.0" styleClass="dashboard-button" text="📄  Biodata" />
+         <Button fx:id="scheduleButton" onAction="#onScheduleButtonClicked" styleClass="dashboard-button-green" text="📅  Jadwal Pelajaran" />
+         <Button fx:id="gradeButton" onAction="#onGradeButtonClicked" styleClass="dashboard-button-red" text="📊  Nilai Akademik" />
+      </VBox>
+   </VBox>
+
+   <!-- Tombol Kembali -->
+   <Button fx:id="backToLogin" onAction="#onBackToLoginClicked" style="-fx-font-size: 14px; -fx-background-color: transparent;                   -fx-text-fill: #636e72; -fx-underline: true; -fx-cursor: hand;" text="← Kembali ke Halaman Login" />
+</VBox>
