@@ -112,6 +112,25 @@ public class AdminViewController {
     }
 
     @FXML
+    void onDeleteUserClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Hapus Pengguna");
+
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteUser-menu.fxml"));
+            Parent root = loader.load();
+
+            DeleteUserMenuController controller = loader.getController();
+            controller.setUser(user);
+
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
     void onLogOutClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();

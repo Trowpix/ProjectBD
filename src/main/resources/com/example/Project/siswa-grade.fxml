@@ -8,11 +8,9 @@
         <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
     </padding>
 
-    <!-- Header Section -->
     <HBox alignment="CENTER_LEFT" spacing="18.0" style="-fx-padding: 0 0 15 0;">
         <Label fx:id="studentNameLabel" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Nilai Akademik" />
         <Label fx:id="classLabel" style="-fx-font-size: 16px; -fx-text-fill: #7f8c8d;" text="Kelas: " />
-<!--        <Region HBox.hgrow="ALWAYS" />-->
         <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;">
             <graphic>
                 <Label style="-fx-text-fill: #e74c3c; -fx-font-weight: bold;" />
@@ -20,41 +18,33 @@
         </Button>
     </HBox>
 
-    <!-- Grades Card -->
     <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 28 32 32 32; -fx-effect: dropshadow(gaussian, rgba(44,62,80,0.10), 14, 0, 0, 2);">
-        <!-- Semester Selection -->
         <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-padding: 0 0 20 0;">
             <Label style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d; -fx-font-size: 15px;" text="Pilih Semester:" />
             <ChoiceBox fx:id="semesterChoice" prefWidth="180.0" style="-fx-background-radius: 6; -fx-font-size: 14px;" />
         </HBox>
 
-        <!-- Grades Table -->
         <TableView fx:id="gradesTable" prefHeight="320.0" prefWidth="700.0" style="-fx-font-size: 14px; -fx-background-radius: 8;">
             <columns>
                 <TableColumn fx:id="mataPelajaranColumn" prefWidth="300" text="Mata Pelajaran">
                     <cellValueFactory>
-                        <!-- PropertyValueFactory property="namaMataPelajaran" -->
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="utsGradeColumn" prefWidth="120" text="UTS">
                     <cellValueFactory>
-                        <!-- PropertyValueFactory property="nilaiUts" -->
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="uasGradeColumn" prefWidth="120" text="UAS">
                     <cellValueFactory>
-                        <!-- PropertyValueFactory property="nilaiUas" -->
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="rataRataColumn" prefWidth="159.199951171875" text="Rata-rata">
                     <cellValueFactory>
-                        <!-- PropertyValueFactory property="rataRata" -->
                     </cellValueFactory>
                 </TableColumn>
             </columns>
         </TableView>
 
-        <!-- Summary Section -->
         <HBox alignment="CENTER_RIGHT" spacing="28.0" style="-fx-padding: 20 0 0 0;">
             <VBox alignment="CENTER_RIGHT" spacing="8.0">
                 <Label style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d; -fx-font-size: 15px;" text="Rata-rata Nilai:" />
@@ -69,7 +59,6 @@
         </HBox>
     </VBox>
 
-    <!-- Navigation Buttons -->
     <HBox alignment="CENTER" spacing="18.0" style="-fx-padding: 20 0 0 0;">
         <Button onAction="#onKembaliClicked" style="-fx-font-size: 15px; -fx-pref-width: 130px; -fx-pref-height: 42px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 8;" text="Kembali" />
         <Button onAction="#onCetakLaporanClicked" style="-fx-font-size: 15px; -fx-pref-width: 160px; -fx-pref-height: 42px; -fx-background-color: linear-gradient(to right, #3498db, #2980b9); -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Cetak Laporan" />

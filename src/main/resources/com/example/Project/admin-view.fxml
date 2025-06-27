@@ -11,7 +11,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Circle?>
 
-<VBox alignment="TOP_CENTER" prefHeight="650.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: linear-gradient(to bottom, #fdedec, #f5e1e1);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.Project.scenes.admin.AdminViewController">
+<VBox alignment="TOP_CENTER" prefHeight="650.0" prefWidth="700.0" spacing="20.0" style="-fx-background-color: linear-gradient(to bottom, #fdedec, #f5e1e1);" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.Project.scenes.admin.AdminViewController">
    <padding>
       <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
    </padding>
@@ -33,7 +33,7 @@
          <children>
             <Label fx:id="adminNameLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Selamat Datang, Admin!" />
             <Separator prefWidth="400.0" style="-fx-background-color: #dfe6e9;" />
-            <TilePane alignment="CENTER" hgap="50.0" prefColumns="2" vgap="40.0">
+            <TilePane alignment="CENTER" hgap="40.0" prefColumns="3" vgap="30.0">
                <padding>
                   <Insets bottom="10.0" top="20.0" />
                </padding>
@@ -80,6 +80,17 @@
                            </children>
                         </StackPane>
                         <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Data Guru" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" onMouseClicked="#onDeleteUserClicked" spacing="10.0" style="-fx-cursor: hand;">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fill="#e74c3c" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
+                              <Label style="-fx-font-size: 38px;" text="🗑️" />
+                           </children>
+                        </StackPane>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Hapus User" />
                      </children>
                   </VBox>
                </children>

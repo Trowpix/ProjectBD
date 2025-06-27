@@ -18,7 +18,6 @@ public class SiswaAbsensi {
         this.izin = new CheckBox();
         this.alpha = new CheckBox();
 
-        // Logika agar hanya satu CheckBox yang bisa dipilih
         hadir.setOnAction(e -> {
             if (hadir.isSelected()) {
                 izin.setSelected(false);
@@ -51,6 +50,6 @@ public class SiswaAbsensi {
         if (hadir.isSelected()) return "Hadir";
         if (izin.isSelected()) return "Izin";
         if (alpha.isSelected()) return "Alpha";
-        return null; // Atau "Belum Diabsen"
+        return null; //
     }
 }
