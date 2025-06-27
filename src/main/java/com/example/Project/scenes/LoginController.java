@@ -36,22 +36,14 @@ public class LoginController {
     private boolean wakiKelas = false;
 
     boolean verifyCredentials(String username, String password, String role) throws SQLException {
-        // Call the database to verify the credentials
-        // This is insecure as this stores the password in plain text.
-        // In a real application, you should hash the password and store it securely.
-
-        // Get a connection to the database
         try (Connection data = MainDataSource.getConnection()){
-            // Create a prepared statement to prevent SQL injection
             PreparedStatement stmt = data.prepareStatement("SELECT * FROM users WHERE login_id = ? AND role = ?");
             stmt.setString(1, username);
             stmt.setString(2, role.toLowerCase());
 
-            // Execute the query
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // User found, check the password
                 String dbPassword = rs.getString("password");
 
                 if (dbPassword.equals(password)) {
@@ -68,7 +60,7 @@ public class LoginController {
                     }
                     user = new User(rs);
                     if (wakiKelas) user.role = "Wali Kelas";
-                    return true; // Credentials are valid
+                    return true;
                 }
             }
         } catch (SQLException e) {
@@ -88,37 +80,28 @@ public class LoginController {
 
     @FXML
     void onLoginClick() {
-        System.out.println("Logging");
-        // Get the username and password from the text fields
         String id = idField.getText();
         String password = passwordField.getText();
         String role = selectRole.getValue();
 
-        // Verify the credentials
         try {
             if (verifyCredentials(id, password, role)) {
                 MainMenu app = MainMenu.getApplicationInstance();
-                // Load the correct view based on the role
-                if (role.equals("Admin")) {
-                    // Load the admin view
-                    app.getPrimaryStage().setTitle("Admin View");
 
-                    // Load fxml and set the scene
+                if (role.equals("Admin")) {
+                    app.getPrimaryStage().setTitle("Admin View");
                     FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
                     Parent root = loader.load();
-                    //pass the user to the next controller
                     AdminViewController adminController = loader.getController();
                     adminController.setUser(user);
 
                     Scene scene = new Scene(root);
                     app.getPrimaryStage().setScene(scene);
                 } else if (role.equals("Siswa")){
-                    // Load the Siswa view
                     app.getPrimaryStage().setTitle("Siswa View");
 
                     FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
                     Parent root = loader.load();
-                    //pass the user to the next controller
                     SiswaViewController siswaViewController = loader.getController();
                     siswaViewController.setUser(user);
 

@@ -1,34 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.Project.scenes.admin.AdminViewController">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox alignment="TOP_CENTER" prefHeight="650.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: linear-gradient(to bottom, #fdedec, #f5e1e1);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.Project.scenes.admin.AdminViewController">
    <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+      <Insets bottom="25.0" left="40.0" right="40.0" top="25.0" />
    </padding>
-
-   <!-- Header with Close Button -->
-   <HBox alignment="CENTER" spacing="20.0">
-      <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Admin Dashboard" />
-      <Region HBox.hgrow="ALWAYS" />
-   </HBox>
-
-   <!-- Admin Functions Card -->
-   <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
-      <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Menu Admin" />
-
-      <!-- Admin Buttons -->
-      <VBox alignment="CENTER" spacing="15.0">
-         <Button fx:id="inputDataSiswa" onAction="#onInputDataSiswaClicked" style="-fx-font-size: 16px; -fx-pref-width: 300px; -fx-pref-height: 50px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;" text="Input Data Siswa" />
-         <Button fx:id="inputJadwalKelas" onAction="#onInputJadwalKelasClicked" style="-fx-font-size: 16px; -fx-pref-width: 300px; -fx-pref-height: 50px; -fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 5;" text="Input Jadwal Kelas" />
-         <Button fx:id="bagiKelas" onAction="#onBagiKelasClicked" style="-fx-font-size: 16px; -fx-pref-width: 300px; -fx-pref-height: 50px; -fx-background-color: #9b59b6; -fx-text-fill: white; -fx-background-radius: 5;" text="Membagi Kelas Siswa dan Wali Kelas" />
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="15.0">
+         <children>
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #922b21;" text="Dashboard Admin" />
+         </children>
+      </HBox>
+      <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 25; -fx-padding: 25;">
+         <effect>
+            <DropShadow blurType="GAUSSIAN" height="40.0" radius="19.5" width="40.0">
+               <color>
+                  <Color opacity="0.1" />
+               </color>
+            </DropShadow>
+         </effect>
+         <children>
+            <Label fx:id="adminNameLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Selamat Datang, Admin!" />
+            <Separator prefWidth="400.0" style="-fx-background-color: #dfe6e9;" />
+            <TilePane alignment="CENTER" hgap="50.0" prefColumns="3" prefRows="1" vgap="30.0">
+               <padding>
+                  <Insets bottom="10.0" top="10.0" />
+               </padding>
+               <children>
+                  <VBox alignment="CENTER" onMouseClicked="#onInputDataSiswaClicked" spacing="10.0" style="-fx-cursor: hand;">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fill="#5dade2" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
+                              <Label style="-fx-font-size: 38px;" text="👤" />
+                           </children>
+                        </StackPane>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Data Siswa" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" onMouseClicked="#onInputJadwalKelasClicked" spacing="10.0" style="-fx-cursor: hand;">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fill="#48c9b0" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
+                              <Label style="-fx-font-size: 38px;" text="🗓️" />
+                           </children>
+                        </StackPane>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Input Jadwal" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" onMouseClicked="#onBagiKelasClicked" spacing="10.0" style="-fx-cursor: hand;">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fill="#af7ac5" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
+                              <Label style="-fx-font-size: 38px;" text="🧑‍🏫" />
+                           </children>
+                        </StackPane>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Bagi Kelas" />
+                     </children>
+                  </VBox>
+               </children>
+            </TilePane>
+         </children>
       </VBox>
-   </VBox>
-
-   <!-- User Info and Logout -->
-   <HBox alignment="CENTER_RIGHT" spacing="15.0">
-      <Label fx:id="adminNameLabel" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;" text="Admin: Nama Admin" />
-      <Button fx:id="logOut" onAction="#onLogOutClicked" style="-fx-font-size: 14px; -fx-pref-width: 100px; -fx-pref-height: 35px; -fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;" text="Logout" />
-   </HBox>
+      <Label onMouseClicked="#onLogOutClicked" style="-fx-font-size: 14px; -fx-background-color: transparent; -fx-text-fill: #34495e; -fx-underline: true; -fx-cursor: hand;" text="Logout →" />
+   </children>
 </VBox>

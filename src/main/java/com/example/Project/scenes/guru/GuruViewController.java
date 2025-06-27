@@ -115,4 +115,26 @@ public class GuruViewController {
             throw new RuntimeException(e);
         }
     }
+
+    @FXML
+    void onKelolaEkskulClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Manajemen Ekstrakurikuler");
+
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-manajemen-ekskul.fxml"));
+            Parent root = loader.load();
+
+            // Kirim data user (jika diperlukan)
+            GuruManajemenEkskulController controller = loader.getController();
+            controller.setUser(this.user); // 'this.user' adalah objek guru yang sedang login
+
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            System.err.println("Gagal memuat halaman manajemen ekstrakurikuler: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -50,7 +50,6 @@ public class SiswaViewController {
     void onBiodataButtonClicked(){
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-            // Load the user view
             app.getPrimaryStage().setTitle("Siswa Biodata");
 
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-biodata.fxml"));
@@ -67,7 +66,6 @@ public class SiswaViewController {
     void onScheduleButtonClicked(){
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-            // Load the user view
             app.getPrimaryStage().setTitle("Siswa Schedule");
 
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-jadwal.fxml"));
@@ -84,7 +82,6 @@ public class SiswaViewController {
     void onGradeButtonClicked(){
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-            // Load the user view
             app.getPrimaryStage().setTitle("Siswa Grade");
 
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-grade.fxml"));
@@ -97,11 +94,31 @@ public class SiswaViewController {
             throw new RuntimeException(e);
         }
     }
+
+    @FXML
+    void onExtracurricularButtonClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Pendaftaran Ekstrakurikuler");
+
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-pendaftaran-eskul.fxml"));
+            Parent root = loader.load();
+
+            SiswaPendaftaranEkskulController controller = loader.getController();
+            controller.setUser(this.user);
+
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            System.err.println("Gagal memuat halaman pendaftaran ekstrakurikuler: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     void onBackToLoginClicked(){
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-            // Load the user view
             app.getPrimaryStage().setTitle("Login");
 
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("login-view.fxml"));
@@ -112,7 +129,4 @@ public class SiswaViewController {
             throw new RuntimeException(e);
         }
     }
-
-
-
 }
