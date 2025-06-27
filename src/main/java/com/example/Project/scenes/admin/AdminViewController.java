@@ -36,7 +36,6 @@ public class AdminViewController {
             if (user.id != null) {
                 PreparedStatement stmt = data.prepareStatement("SELECT * FROM admins WHERE admin_code = ?");
                 stmt.setString(1, user.id);
-                // Execute the query
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     user.username = rs.getString("nama_admin");
@@ -52,9 +51,7 @@ public class AdminViewController {
     void onInputDataSiswaClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-
             app.getPrimaryStage().setTitle("Input Data Siswa");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputDataSiswa.fxml"));
             Parent root = loader.load();
             InputDataSiswaController inputDataSiswaController = loader.getController();
@@ -67,12 +64,26 @@ public class AdminViewController {
     }
 
     @FXML
+    void onInputDataGuruClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Input Data Guru");
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputDataGuru.fxml"));
+            Parent root = loader.load();
+            InputDataGuruController controller = loader.getController();
+            controller.setUser(user);
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
     void onInputJadwalKelasClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-
             app.getPrimaryStage().setTitle("Input Jadwal Kelas");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputJadwalKelas.fxml"));
             Parent root = loader.load();
             InputJadwalKelasController inputJadwalKelasController = loader.getController();
@@ -88,9 +99,7 @@ public class AdminViewController {
     void onBagiKelasClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-
             app.getPrimaryStage().setTitle("Pembagian Kelas");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-membagiKelas.fxml"));
             Parent root = loader.load();
             MembagiKelasController membagiKelasController = loader.getController();
@@ -106,12 +115,11 @@ public class AdminViewController {
     void onLogOutClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-
             app.getPrimaryStage().setTitle("Login");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("login-view.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
+            scene.getStylesheets().add(MainMenu.class.getResource("login-styles.css").toExternalForm());
             app.getPrimaryStage().setScene(scene);
         } catch (IOException e) {
             throw new RuntimeException(e);

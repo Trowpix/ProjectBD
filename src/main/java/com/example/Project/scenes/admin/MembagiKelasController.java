@@ -22,7 +22,6 @@ import java.sql.SQLException;
 
 public class MembagiKelasController {
 
-
     @FXML
     private ChoiceBox<String> kelasChoiceBox;
     @FXML
@@ -48,45 +47,133 @@ public class MembagiKelasController {
 
     @FXML
     void initialize() {
-        assignedStudentsList.setItems(null);
+        assignedStudentsList.setItems(FXCollections.observableArrayList());
     }
 
     void update(){
         ObservableList<String> unassigned = FXCollections.observableArrayList();
         try (Connection data = MainDataSource.getConnection()){
-            PreparedStatement stmt = data.prepareStatement("SELECT * FROM siswa WHERE id_kelas IS NULL");
+            PreparedStatement stmt = data.prepareStatement("SELECT * FROM siswa WHERE id_kelas IS NULL ORDER BY nama_siswa");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                unassigned.add("("+rs.getString("nomor_induk_siswa")+") - "+rs.getString("nama_siswa"));
+                unassigned.add("(" + rs.getString("nomor_induk_siswa") + ") - " + rs.getString("nama_siswa"));
             }
             unassignedStudentsList.setItems(unassigned);
         }catch (SQLException e){
-            System.out.println("Error update: "+e);
+            System.out.println("Error update: " + e);
         }
     }
 
     void initializeChoiceBox(){
         ObservableList<String> kelasList = FXCollections.observableArrayList();
-        ObservableList<String> waliKelasList = FXCollections.observableArrayList();
         try (Connection data = MainDataSource.getConnection()){
-            PreparedStatement stmt = data.prepareStatement("SELECT DISTINCT nama_kelas FROM kelas");
+            PreparedStatement stmt = data.prepareStatement("SELECT DISTINCT nama_kelas FROM kelas ORDER BY nama_kelas");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 kelasList.add(rs.getString("nama_kelas"));
             }
             kelasChoiceBox.setItems(kelasList);
-            stmt = data.prepareStatement("SELECT nama_guru FROM guru WHERE nip IN (SELECT nip_guru FROM wali_kelas)");
-            rs = stmt.executeQuery();
-            while (rs.next()){
-                waliKelasList.add(rs.getString("nama_guru"));
-            }
-            waliKelasChoice.setItems(waliKelasList);
         }catch (SQLException e){
-            System.out.println("Error initializeChoiceBox: "+e);
+            System.out.println("Error initializeChoiceBox: " + e);
         }
     }
 
 
+
+    @FXML
+    void onSimpanWaliKelasClicked() {
+        String selectedWali = waliKelasChoice.getValue();
+        String selectedKelas = kelasChoiceBox.getValue();
+
+        if (selectedWali == null || selectedKelas == null) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Pilih kelas dan calon wali kelas terlebih dahulu.");
+            return;
+        }
+
+        try (Connection data = MainDataSource.getConnection()) {
+            data.setAutoCommit(false);
+
+            PreparedStatement stmt = data.prepareStatement("UPDATE wali_kelas SET id_kelas = NULL WHERE id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?)");
+            stmt.setString(1, selectedKelas);
+            stmt.executeUpdate();
+
+            stmt = data.prepareStatement("UPDATE wali_kelas SET id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?) WHERE nip_guru = (SELECT nip FROM guru WHERE nama_guru = ?)");
+            stmt.setString(1, selectedKelas);
+            stmt.setString(2, selectedWali);
+            stmt.executeUpdate();
+
+            data.commit();
+
+            waliKelasLabel.setText(selectedWali);
+            showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Wali kelas telah berhasil diperbarui.");
+        } catch (SQLException e) {
+            System.out.println("Error SimpanWali: " + e);
+            showAlert(Alert.AlertType.ERROR, "Gagal", "Terjadi kesalahan saat menyimpan data wali kelas.");
+        }
+    }
+
+    @FXML
+    void onSimpanClicked() {
+        if (kelasChoiceBox.getValue() == null){
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Pilih kelas terlebih dahulu sebelum menyimpan.");
+            return;
+        }
+
+        try (Connection data = MainDataSource.getConnection()) {
+            data.setAutoCommit(false);
+            String idKelas = "(SELECT id_kelas FROM kelas WHERE nama_kelas = '" + kelasChoiceBox.getValue() + "')";
+
+            for (String siswaInfo : assignedStudentsList.getItems()) {
+                String nis = getNis(siswaInfo);
+                PreparedStatement stmt = data.prepareStatement("UPDATE siswa SET id_kelas = " + idKelas + " WHERE nomor_induk_siswa = ?");
+                stmt.setString(1, nis);
+                stmt.executeUpdate();
+            }
+            for (String siswaInfo : unassignedStudentsList.getItems()) {
+                String nis = getNis(siswaInfo);
+                PreparedStatement stmt = data.prepareStatement("UPDATE siswa SET id_kelas = NULL WHERE nomor_induk_siswa = ?");
+                stmt.setString(1, nis);
+                stmt.executeUpdate();
+            }
+            data.commit();
+
+            showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Pembagian kelas siswa telah berhasil disimpan.");
+        } catch (SQLException e) {
+            System.out.println("Error SimpanClicked: " + e);
+            showAlert(Alert.AlertType.ERROR, "Gagal", "Terjadi kesalahan saat menyimpan pembagian kelas.");
+        }
+    }
+
+    @FXML
+    void onResetClicked() {
+        update();
+        kelasChoiceBox.setValue(null);
+        waliKelasChoice.setItems(null);
+        assignedStudentsList.getItems().clear();
+        kelasLabel.setText("Nama Kelas");
+        jumlahSiswaLabel.setText("0");
+        waliKelasLabel.setText("Belum Dipilih");
+    }
+
+    @FXML
+    void onTambahkanClicked() {
+        String selectedSiswa = unassignedStudentsList.getSelectionModel().getSelectedItem();
+        if (selectedSiswa != null) {
+            assignedStudentsList.getItems().add(selectedSiswa);
+            unassignedStudentsList.getItems().remove(selectedSiswa);
+            jumlahSiswaLabel.setText(String.valueOf(assignedStudentsList.getItems().size()));
+        }
+    }
+
+    @FXML
+    void onKembalikanClicked() {
+        String selectedSiswa = assignedStudentsList.getSelectionModel().getSelectedItem();
+        if (selectedSiswa != null){
+            unassignedStudentsList.getItems().add(selectedSiswa);
+            assignedStudentsList.getItems().remove(selectedSiswa);
+            jumlahSiswaLabel.setText(String.valueOf(assignedStudentsList.getItems().size()));
+        }
+    }
 
     @FXML
     void onKembaliClicked() {
@@ -94,7 +181,6 @@ public class MembagiKelasController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin View");
 
-            // Load fxml and set the scene
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
             Parent root = loader.load();
             AdminViewController adminController = loader.getController();
@@ -106,125 +192,18 @@ public class MembagiKelasController {
         }
     }
 
-    String getNis(String s){
-        int end = 1;
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == ')') end=i;
+    private String getNis(String s){
+        if (s == null || !s.contains("(") || !s.contains(")")) {
+            return "";
         }
-        return s.substring(1,end);
+        return s.substring(s.indexOf('(') + 1, s.indexOf(')'));
     }
 
-    @FXML
-    void onTampilkanDataClicked(){
-        if (kelasChoiceBox.getValue()!= null) {
-            String kelas = kelasChoiceBox.getValue();
-            onResetClicked();
-            kelasChoiceBox.setValue(kelas);
-            ObservableList<String> assigned = FXCollections.observableArrayList();
-            kelasLabel.setText(kelasChoiceBox.getValue());
-            try (Connection data = MainDataSource.getConnection()) {
-                PreparedStatement stmt = data.prepareStatement("SELECT * FROM siswa WHERE id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?)");
-                stmt.setString(1, kelasChoiceBox.getValue());
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    assigned.add("(" + rs.getString("nomor_induk_siswa") + ") - " + rs.getString("nama_siswa"));
-                }
-                assignedStudentsList.setItems(assigned);
-                stmt = data.prepareStatement("SELECT nama_guru FROM guru WHERE nip = (SELECT nip_guru FROM wali_kelas WHERE id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?))");
-                stmt.setString(1, kelasChoiceBox.getValue());
-                rs = stmt.executeQuery();
-                if (rs.next()){
-                    waliKelasLabel.setText(rs.getString("nama_guru"));
-                    waliKelasChoice.setValue(rs.getString("nama_guru"));
-                }
-                stmt = data.prepareStatement("SELECT COUNT(nomor_induk_siswa) FROM siswa WHERE id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?)");
-                stmt.setString(1, kelasChoiceBox.getValue());
-                rs = stmt.executeQuery();
-                if (rs.next()){
-                    jumlahSiswaLabel.setText(String.valueOf(rs.getInt(1)));
-                }
-
-            } catch (SQLException e) {
-                System.out.println("Error tampilkan data: " + e);
-            }
-        }
-    }
-
-    @FXML
-    void onSimpanClicked() {
-        if (kelasChoiceBox.getValue() != null && assignedStudentsList.getItems() != null && unassignedStudentsList.getItems() != null){
-            try (Connection data = MainDataSource.getConnection()) {
-                PreparedStatement stmt;
-                for (int i = 0; i < assignedStudentsList.getItems().size(); i++) {
-                    String nis = getNis(assignedStudentsList.getItems().get(i));
-                    stmt = data.prepareStatement("UPDATE siswa SET id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?) WHERE nomor_induk_siswa = ?");
-                    stmt.setString(1, kelasChoiceBox.getValue());
-                    stmt.setString(2, nis);
-                    stmt.executeUpdate();
-                }
-                for (int i = 0; i < unassignedStudentsList.getItems().size(); i++) {
-                    String nis = getNis(unassignedStudentsList.getItems().get(i));
-                    stmt = data.prepareStatement("UPDATE siswa SET id_kelas = null WHERE nomor_induk_siswa = ?");
-                    stmt.setString(1, nis);
-                    stmt.executeUpdate();
-                }
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Data berhasil");
-                alert.setHeaderText("Data telah berhasil dimasukan");
-                alert.showAndWait();
-
-            } catch (SQLException e) {
-                System.out.println("Error SimpanClicked: " + e);
-            }
-        }
-    }
-
-    @FXML
-    void onResetClicked() {
-        update();
-        kelasChoiceBox.setValue(null);
-        waliKelasChoice.setValue(null);
-        assignedStudentsList.setItems(null);
-        kelasLabel.setText("Nama Kelas");
-        jumlahSiswaLabel.setText("0");
-        waliKelasLabel.setText("Belum Dipilih");
-    }
-
-    @FXML
-    void onTambahkanClicked() {
-        if (unassignedStudentsList.getSelectionModel().getSelectedItem() != null && assignedStudentsList.getItems() != null) {
-            assignedStudentsList.getItems().add(unassignedStudentsList.getSelectionModel().getSelectedItem());
-            unassignedStudentsList.getItems().remove(unassignedStudentsList.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    @FXML
-    void onKembalikanClicked() {
-        if (assignedStudentsList.getSelectionModel().getSelectedItem() != null){
-            unassignedStudentsList.getItems().add(assignedStudentsList.getSelectionModel().getSelectedItem());
-            assignedStudentsList.getItems().remove(assignedStudentsList.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    @FXML
-     void onSimpanWaliKelasClicked() {
-        if (waliKelasChoice.getValue()!= null) {
-            try (Connection data = MainDataSource.getConnection()) {
-                PreparedStatement stmt = data.prepareStatement("UPDATE wali_kelas SET id_kelas = NULL WHERE id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?);\n" +
-                        "UPDATE wali_kelas SET id_kelas = (SELECT id_kelas FROM kelas WHERE nama_kelas = ?) WHERE nip_guru = (SELECT nip FROM guru WHERE nama_guru = ?);");
-                stmt.setString(1, kelasChoiceBox.getValue());
-                stmt.setString(2, kelasChoiceBox.getValue());
-                stmt.setString(3, waliKelasChoice.getValue());
-                stmt.executeUpdate();
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Data berhasil");
-                alert.setHeaderText("Data telah berhasil dimasukan");
-                alert.showAndWait();
-            } catch (SQLException e) {
-                System.out.println("Error SimpanWali: " + e);
-            }
-        }
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

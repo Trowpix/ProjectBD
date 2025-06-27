@@ -21,6 +21,7 @@
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #922b21;" text="Dashboard Admin" />
          </children>
       </HBox>
+
       <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 25; -fx-padding: 25;">
          <effect>
             <DropShadow blurType="GAUSSIAN" height="40.0" radius="19.5" width="40.0">
@@ -32,9 +33,9 @@
          <children>
             <Label fx:id="adminNameLabel" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Selamat Datang, Admin!" />
             <Separator prefWidth="400.0" style="-fx-background-color: #dfe6e9;" />
-            <TilePane alignment="CENTER" hgap="50.0" prefColumns="3" prefRows="1" vgap="30.0">
+            <TilePane alignment="CENTER" hgap="50.0" prefColumns="2" vgap="40.0">
                <padding>
-                  <Insets bottom="10.0" top="10.0" />
+                  <Insets bottom="10.0" top="20.0" />
                </padding>
                <children>
                   <VBox alignment="CENTER" onMouseClicked="#onInputDataSiswaClicked" spacing="10.0" style="-fx-cursor: hand;">
@@ -64,16 +65,31 @@
                         <StackPane>
                            <children>
                               <Circle fill="#af7ac5" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
-                              <Label style="-fx-font-size: 38px;" text="🧑‍🏫" />
+                              <Label style="-fx-font-size: 38px;" text="🏫" />
                            </children>
                         </StackPane>
                         <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Bagi Kelas" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" onMouseClicked="#onInputDataGuruClicked" spacing="10.0" style="-fx-cursor: hand;">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Circle fill="#f39c12" radius="45.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="3.0" />
+                              <Label style="-fx-font-size: 38px;" text="🧑‍🏫" />
+                           </children>
+                        </StackPane>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #576574;" text="Data Guru" />
                      </children>
                   </VBox>
                </children>
             </TilePane>
          </children>
       </VBox>
-      <Label onMouseClicked="#onLogOutClicked" style="-fx-font-size: 14px; -fx-background-color: transparent; -fx-text-fill: #34495e; -fx-underline: true; -fx-cursor: hand;" text="Logout →" />
+      <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Label onMouseClicked="#onLogOutClicked" style="-fx-font-size: 14px; -fx-background-color: transparent; -fx-text-fill: #34495e; -fx-underline: true; -fx-cursor: hand;" text="Logout →" />
+         </children>
+      </HBox>
    </children>
 </VBox>

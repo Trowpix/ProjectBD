@@ -124,6 +124,9 @@ public class SiswaViewController {
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("login-view.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
+
+            scene.getStylesheets().add(MainMenu.class.getResource("login-styles.css").toExternalForm());
+
             app.getPrimaryStage().setScene(scene);
         } catch (IOException e) {
             throw new RuntimeException(e);

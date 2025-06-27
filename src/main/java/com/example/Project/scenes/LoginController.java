@@ -12,7 +12,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -24,13 +26,16 @@ import java.sql.SQLException;
 public class LoginController {
 
     @FXML
-    private TextField passwordField;
+    private PasswordField passwordField;
 
     @FXML
     private ChoiceBox<String> selectRole;
 
     @FXML
     private TextField idField;
+
+    @FXML
+    private Button loginButton;
 
     private User user;
     private boolean wakiKelas = false;
@@ -71,11 +76,8 @@ public class LoginController {
 
     @FXML
     void initialize() {
-        idField.setText("SD0");
-        passwordField.setText("12");
-
         selectRole.getItems().addAll("Admin", "Siswa", "Guru");
-        selectRole.setValue("");
+        selectRole.setValue("Admin");
     }
 
     @FXML
@@ -83,6 +85,15 @@ public class LoginController {
         String id = idField.getText();
         String password = passwordField.getText();
         String role = selectRole.getValue();
+
+        if (id.isEmpty() || password.isEmpty() || role == null || role.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Input Tidak Lengkap");
+            alert.setHeaderText(null);
+            alert.setContentText("Harap isi semua field (Peran, User ID, dan Password).");
+            alert.showAndWait();
+            return;
+        }
 
         try {
             if (verifyCredentials(id, password, role)) {
@@ -133,22 +144,20 @@ public class LoginController {
                     }
                 }
             } else {
-                // Show an error message
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Failed");
-                alert.setHeaderText("Invalid Credentials");
-                alert.setContentText("Please check your username and password.");
+                alert.setTitle("Login Gagal");
+                alert.setHeaderText(null);
+                alert.setContentText("User ID, Password, atau Peran salah. Silakan periksa kembali.");
                 alert.showAndWait();
             }
         } catch (SQLException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Database Error");
-            alert.setHeaderText("Database Connection Failed");
-            alert.setContentText("Could not connect to the database. Please try again later.");
+            alert.setHeaderText("Koneksi Database Gagal");
+            alert.setContentText("Tidak dapat terhubung ke database. Silakan coba lagi nanti.");
             alert.showAndWait();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 }
