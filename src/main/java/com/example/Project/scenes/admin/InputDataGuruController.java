@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -20,7 +21,7 @@ import java.sql.SQLException;
 public class InputDataGuruController {
 
     @FXML
-    private TextField nipField;
+    private Label nipLabel;
     @FXML
     private TextField namaGuruField;
     @FXML
@@ -33,13 +34,32 @@ public class InputDataGuruController {
     }
 
     @FXML
+    void initialize() {
+        nipLabel.setText("(Akan dibuat otomatis)");
+    }
+
+    private String generateNewNip(Connection conn) throws SQLException {
+        String lastNipSql = "SELECT nip FROM guru WHERE nip LIKE 'G%' ORDER BY CAST(SUBSTRING(nip, 2) AS INTEGER) DESC LIMIT 1";
+        PreparedStatement pstmt = conn.prepareStatement(lastNipSql);
+        ResultSet rs = pstmt.executeQuery();
+
+        int nextNumber = 1;
+        if (rs.next()) {
+            String lastNip = rs.getString("nip");
+            int lastNumber = Integer.parseInt(lastNip.substring(1));
+            nextNumber = lastNumber + 1;
+        }
+
+        return String.format("G%03d", nextNumber);
+    }
+
+    @FXML
     void onSimpanDataClicked() {
-        String nip = nipField.getText();
         String nama = namaGuruField.getText();
         String password = passwordField.getText();
 
-        if (nip.isEmpty() || nama.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Input Tidak Lengkap", "Harap isi semua field (NIP, Nama, dan Password).");
+        if (nama.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Input Tidak Lengkap", "Harap isi Nama dan Password.");
             return;
         }
 
@@ -48,30 +68,22 @@ public class InputDataGuruController {
             conn = MainDataSource.getConnection();
             conn.setAutoCommit(false);
 
-            String checkSql = "SELECT 1 FROM users WHERE login_id = ?";
-            PreparedStatement checkStmt = conn.prepareStatement(checkSql);
-            checkStmt.setString(1, nip);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next()) {
-                showAlert(Alert.AlertType.ERROR, "Data Duplikat", "NIP " + nip + " sudah terdaftar di sistem.");
-                conn.rollback();
-                return;
-            }
+            String newNip = generateNewNip(conn);
 
             String insertUserSql = "INSERT INTO users (login_id, password, role) VALUES (?, ?, 'guru')";
             PreparedStatement userPstmt = conn.prepareStatement(insertUserSql);
-            userPstmt.setString(1, nip);
+            userPstmt.setString(1, newNip);
             userPstmt.setString(2, password);
             userPstmt.executeUpdate();
 
             String insertGuruSql = "INSERT INTO guru (nip, nama_guru) VALUES (?, ?)";
             PreparedStatement guruPstmt = conn.prepareStatement(insertGuruSql);
-            guruPstmt.setString(1, nip);
+            guruPstmt.setString(1, newNip);
             guruPstmt.setString(2, nama);
             guruPstmt.executeUpdate();
 
             conn.commit();
-            showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Data guru baru telah berhasil disimpan.");
+            showAlert(Alert.AlertType.INFORMATION, "Berhasil", "Data guru baru dengan NIP " + newNip + " telah berhasil disimpan.");
             onResetFormClicked();
 
         } catch (SQLException e) {
@@ -82,7 +94,7 @@ public class InputDataGuruController {
                     ex.printStackTrace();
                 }
             }
-            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal menyimpan data ke database.");
+            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal menyimpan data. Kemungkinan NIP sudah ada atau terjadi kesalahan lain.");
             e.printStackTrace();
         } finally {
             if (conn != null) {
@@ -98,9 +110,9 @@ public class InputDataGuruController {
 
     @FXML
     void onResetFormClicked() {
-        nipField.clear();
         namaGuruField.clear();
         passwordField.clear();
+        nipLabel.setText("(Akan dibuat otomatis)");
     }
 
     @FXML
@@ -108,7 +120,6 @@ public class InputDataGuruController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin View");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
             Parent root = loader.load();
             AdminViewController adminController = loader.getController();

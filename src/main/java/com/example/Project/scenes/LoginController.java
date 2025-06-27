@@ -7,6 +7,8 @@ import com.example.Project.scenes.admin.AdminViewController;
 import com.example.Project.scenes.guru.GuruViewController;
 import com.example.Project.scenes.siswa.SiswaViewController;
 import com.example.Project.scenes.walikelas.WaliKelasViewController;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,8 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,20 +29,56 @@ public class LoginController {
 
     @FXML
     private PasswordField passwordField;
-
     @FXML
     private ChoiceBox<String> selectRole;
-
     @FXML
-    private TextField idField;
-
+    private ComboBox<String> idComboBox;
     @FXML
     private Button loginButton;
 
     private User user;
     private boolean wakiKelas = false;
 
+    @FXML
+    void initialize() {
+        selectRole.getItems().addAll("Admin", "Siswa", "Guru");
+        idComboBox.setDisable(true);
+
+        selectRole.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                idComboBox.setDisable(false);
+                populateIdComboBox(newValue);
+            } else {
+                idComboBox.setDisable(true);
+                idComboBox.getItems().clear();
+            }
+        });
+    }
+
+    private void populateIdComboBox(String role) {
+        ObservableList<String> idList = FXCollections.observableArrayList();
+        String sql = "SELECT login_id FROM users WHERE role = ? ORDER BY login_id";
+
+        try (Connection conn = MainDataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, role.toLowerCase());
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                idList.add(rs.getString("login_id"));
+            }
+
+            idComboBox.setItems(idList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     boolean verifyCredentials(String username, String password, String role) throws SQLException {
+        if (username == null || password == null || role == null) return false;
+
         try (Connection data = MainDataSource.getConnection()){
             PreparedStatement stmt = data.prepareStatement("SELECT * FROM users WHERE login_id = ? AND role = ?");
             stmt.setString(1, username);
@@ -50,18 +88,12 @@ public class LoginController {
 
             if (rs.next()) {
                 String dbPassword = rs.getString("password");
-
                 if (dbPassword.equals(password)) {
                     if (role.equalsIgnoreCase("guru")) {
-                        try {
-                            stmt = data.prepareStatement("SELECT * FROM wali_kelas WHERE nip_guru = ?");
-                            stmt.setString(1, username);
-
-                            ResultSet ts = stmt.executeQuery();
-                            if (ts.next()) wakiKelas = true;
-                        } catch (SQLException e) {
-                            return false;
-                        }
+                        PreparedStatement waliStmt = data.prepareStatement("SELECT * FROM wali_kelas WHERE nip_guru = ? AND id_kelas IS NOT NULL");
+                        waliStmt.setString(1, username);
+                        ResultSet ts = waliStmt.executeQuery();
+                        if (ts.next()) wakiKelas = true;
                     }
                     user = new User(rs);
                     if (wakiKelas) user.role = "Wali Kelas";
@@ -75,89 +107,80 @@ public class LoginController {
     }
 
     @FXML
-    void initialize() {
-        selectRole.getItems().addAll("Admin", "Siswa", "Guru");
-        selectRole.setValue("Admin");
-    }
-
-    @FXML
     void onLoginClick() {
-        String id = idField.getText();
+        String id = idComboBox.getValue();
         String password = passwordField.getText();
         String role = selectRole.getValue();
 
-        if (id.isEmpty() || password.isEmpty() || role == null || role.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Input Tidak Lengkap");
-            alert.setHeaderText(null);
-            alert.setContentText("Harap isi semua field (Peran, User ID, dan Password).");
-            alert.showAndWait();
+        if (id == null || password.isEmpty() || role == null || role.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Input Tidak Lengkap", "Harap pilih Peran, User ID, dan isi Password.");
             return;
         }
 
         try {
             if (verifyCredentials(id, password, role)) {
                 MainMenu app = MainMenu.getApplicationInstance();
+                String fxmlFile = "";
+                String title = "";
 
                 if (role.equals("Admin")) {
-                    app.getPrimaryStage().setTitle("Admin View");
-                    FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
-                    Parent root = loader.load();
-                    AdminViewController adminController = loader.getController();
-                    adminController.setUser(user);
-
-                    Scene scene = new Scene(root);
-                    app.getPrimaryStage().setScene(scene);
-                } else if (role.equals("Siswa")){
-                    app.getPrimaryStage().setTitle("Siswa View");
-
-                    FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
-                    Parent root = loader.load();
-                    SiswaViewController siswaViewController = loader.getController();
-                    siswaViewController.setUser(user);
-
-                    Scene scene = new Scene(root);
-                    app.getPrimaryStage().setScene(scene);
-                }  else if (role.equals("Guru")){
+                    fxmlFile = "admin-view.fxml";
+                    title = "Admin Dashboard";
+                } else if (role.equals("Siswa")) {
+                    fxmlFile = "siswa-view.fxml";
+                    title = "Siswa Dashboard";
+                } else if (role.equals("Guru")) {
                     if (wakiKelas) {
-                        app.getPrimaryStage().setTitle("Wali Kelas View");
-
-                        FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-walikelasView.fxml"));
-                        Parent root = loader.load();
-
-                        WaliKelasViewController waliKelasController = loader.getController();
-                        waliKelasController.setUser(user);
-
-                        Scene scene = new Scene(root);
-                        app.getPrimaryStage().setScene(scene);
-                    }else {
-                        app.getPrimaryStage().setTitle("Guru View");
-
-                        FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-view.fxml"));
-                        Parent root = loader.load();
-
-                        GuruViewController guruController = loader.getController();
-                        guruController.setUser(user);
-
-                        Scene scene = new Scene(root);
-                        app.getPrimaryStage().setScene(scene);
+                        fxmlFile = "guru-walikelasView.fxml";
+                        title = "Wali Kelas Dashboard";
+                    } else {
+                        fxmlFile = "guru-view.fxml";
+                        title = "Guru Dashboard";
                     }
                 }
+
+                loadScene(fxmlFile, title);
+
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Gagal");
-                alert.setHeaderText(null);
-                alert.setContentText("User ID, Password, atau Peran salah. Silakan periksa kembali.");
-                alert.showAndWait();
+                showAlert(Alert.AlertType.ERROR, "Login Gagal", "User ID atau Password salah.");
             }
         } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setHeaderText("Koneksi Database Gagal");
-            alert.setContentText("Tidak dapat terhubung ke database. Silakan coba lagi nanti.");
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Tidak dapat terhubung ke database.");
+            e.printStackTrace();
+        }
+    }
+
+    private void loadScene(String fxmlFile, String title) {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource(fxmlFile));
+            Parent root = loader.load();
+
+            Object controller = loader.getController();
+            if (controller instanceof AdminViewController) ((AdminViewController) controller).setUser(user);
+            if (controller instanceof SiswaViewController) ((SiswaViewController) controller).setUser(user);
+            if (controller instanceof GuruViewController) ((GuruViewController) controller).setUser(user);
+            if (controller instanceof WaliKelasViewController) ((WaliKelasViewController) controller).setUser(user);
+
+            Scene scene = new Scene(root);
+
+            if (fxmlFile.equals("login-view.fxml")) {
+                scene.getStylesheets().add(MainMenu.class.getResource("login-styles.css").toExternalForm());
+            }
+
+            app.getPrimaryStage().setTitle(title);
+            app.getPrimaryStage().setScene(scene);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

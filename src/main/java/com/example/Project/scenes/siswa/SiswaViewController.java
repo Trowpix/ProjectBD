@@ -116,6 +116,25 @@ public class SiswaViewController {
     }
 
     @FXML
+    void onAbsensiButtonClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Riwayat Absensi");
+
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-absensi.fxml"));
+            Parent root = loader.load();
+
+            SiswaAbsensiController controller = loader.getController();
+            controller.setUser(user);
+
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
     void onBackToLoginClicked(){
         try {
             MainMenu app = MainMenu.getApplicationInstance();

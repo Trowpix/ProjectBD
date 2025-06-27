@@ -30,8 +30,8 @@
                 <RowConstraints />
             </rowConstraints>
 
-            <Label style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;" text="NIP (Nomor Induk):" GridPane.rowIndex="0" />
-            <TextField fx:id="nipField" promptText="Masukkan NIP" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Label style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;" text="NIP (Otomatis):" GridPane.rowIndex="0" />
+            <Label fx:id="nipLabel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="G001" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
             <Label style="-fx-font-weight: bold; -fx-text-fill: #7f8c8d;" text="Nama Lengkap:" GridPane.rowIndex="1" />
             <TextField fx:id="namaGuruField" promptText="Masukkan Nama Lengkap Guru" GridPane.columnIndex="1" GridPane.rowIndex="1" />

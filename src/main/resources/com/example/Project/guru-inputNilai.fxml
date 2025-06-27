@@ -42,7 +42,7 @@
         <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Input Nilai Siswa" />
         <GridPane hgap="15" vgap="12">
             <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" text="Pilih NIS Siswa:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <ComboBox fx:id="nisComboBox" onAction="#onNisPicked" onDragExited="#onNisPicked" onMouseClicked="#onKelasPicked" onMouseExited="#onNisPicked" prefWidth="180" promptText="Pilih NIS" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <ComboBox fx:id="nisComboBox" onAction="#onNisPicked" onDragExited="#onNisPicked" onMouseExited="#onNisPicked" prefWidth="180" promptText="Pilih NIS" GridPane.columnIndex="1" GridPane.rowIndex="0" />
             <Label style="-fx-font-size: 15px; -fx-text-fill: #34495e;" text="Nama Siswa:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
             <Label fx:id="namaSiswaLabel" style="-fx-font-size: 15px; -fx-text-fill: #2c3e50;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label style="-fx-font-size: 15px; -fx-text-fill: #34495e;" text="UTS:" GridPane.columnIndex="0" GridPane.rowIndex="2" />

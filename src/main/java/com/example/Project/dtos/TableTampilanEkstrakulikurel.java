@@ -1,6 +1,5 @@
 package com.example.Project.dtos;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class TableTampilanEkstrakulikurel {

@@ -39,97 +39,121 @@ public class InputDataSiswaController {
     @FXML
     void initialize() {
         jenisKelaminChoice.getItems().addAll("L","P");
-        jenisKelaminChoice.setValue(null);
-
         agamaChoice.getItems().addAll("Islam", "Kristen", "Katolik", "Hindu", "Buddha", "Konghucu");
-        agamaChoice.setValue(null);
-
         golonganDarahChoice.getItems().addAll("A", "B", "AB", "O");
-        golonganDarahChoice.setValue(null);
         tanggalLahirPicker.setEditable(false);
     }
 
     @FXML
     void onResetFormClicked() {
-        namaLengkapField.setText(null);
-        tempatLahirField.setText(null);
+        namaLengkapField.clear();
+        tempatLahirField.clear();
         tanggalLahirPicker.setValue(null);
         jenisKelaminChoice.setValue(null);
         agamaChoice.setValue(null);
-        alamatField.setText(null);
-        nomorTeleponField.setText(null);
+        alamatField.clear();
+        nomorTeleponField.clear();
         golonganDarahChoice.setValue(null);
     }
 
     @FXML
     void onSimpanDataClicked() {
-        String nip = "SD";
-        if (cekData()){
-            try(Connection data = MainDataSource.getConnection()){
-                PreparedStatement stmt = data.prepareStatement("SELECT nomor_induk_siswa FROM siswa ORDER BY nomor_induk_siswa DESC LIMIT 1");
-                ResultSet rs = stmt.executeQuery();
-                String no = "";
-                if (rs.next()){
-                     no += (Integer.parseInt(rs.getString("nomor_induk_siswa").substring(2)) + 1);
+        if (!cekInputValid()) {
+            return;
+        }
+
+        Connection conn = null;
+        try {
+            conn = MainDataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            String newNis = generateNewNis(conn);
+            String newPassword = generateNewPassword(conn);
+
+            String userSql = "INSERT INTO users (login_id, password, role) VALUES (?, ?, 'siswa')";
+            PreparedStatement userStmt = conn.prepareStatement(userSql);
+            userStmt.setString(1, newNis);
+            userStmt.setString(2, newPassword);
+            userStmt.executeUpdate();
+
+            String siswaSql = "INSERT INTO siswa (nomor_induk_siswa, nama_siswa, tempat_lahir_siswa, tanggal_lahir_siswa, gender_siswa, agama, alamat, no_hp, golongan_darah) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement siswaStmt = conn.prepareStatement(siswaSql);
+            siswaStmt.setString(1, newNis);
+            siswaStmt.setString(2, namaLengkapField.getText());
+            siswaStmt.setString(3, tempatLahirField.getText());
+            siswaStmt.setDate(4, Date.valueOf(tanggalLahirPicker.getValue()));
+            siswaStmt.setString(5, jenisKelaminChoice.getValue());
+            siswaStmt.setString(6, agamaChoice.getValue());
+            siswaStmt.setString(7, alamatField.getText());
+            siswaStmt.setString(8, nomorTeleponField.getText());
+            siswaStmt.setString(9, golonganDarahChoice.getValue());
+            siswaStmt.executeUpdate();
+
+            conn.commit();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Data Berhasil Disimpan");
+            alert.setHeaderText("Siswa baru berhasil ditambahkan.");
+            alert.setContentText("NIS: " + newNis + "\nPassword Awal: " + newPassword);
+            alert.showAndWait();
+
+            onResetFormClicked();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
-                if (no.length()<3){
-                    no = "0"+no;
+            }
+            showAlert(Alert.AlertType.ERROR, "Kesalahan Database", "Gagal menyimpan data siswa.");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-                nip+=no;
-
-                stmt = data.prepareStatement("INSERT INTO users (login_id, password, role) VALUES (?, ?, ?); INSERT INTO siswa (nomor_induk_siswa, nama_siswa, tempat_lahir_siswa, tanggal_lahir_siswa, gender_siswa, agama, alamat, no_hp, golongan_darah) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
-                stmt.setString(1,nip);
-                stmt.setString(2, String.valueOf(tanggalLahirPicker.getValue()));
-                stmt.setString(3,"siswa");
-                stmt.setString(4, nip);
-                stmt.setString(5, namaLengkapField.getText());
-                stmt.setString(6, tempatLahirField.getText());
-                stmt.setDate(7, Date.valueOf(tanggalLahirPicker.getValue()));
-                stmt.setString(8, jenisKelaminChoice.getValue());
-                stmt.setString(9, agamaChoice.getValue());
-                stmt.setString(10, alamatField.getText());
-                stmt.setString(11, nomorTeleponField.getText());
-                stmt.setString(12, golonganDarahChoice.getValue());
-
-                stmt.executeUpdate();
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Data berhasil");
-                alert.setHeaderText("Data telah berhasil dimasukan");
-                alert.showAndWait();
-            }catch (SQLException e){
-                System.out.println("Error: "+e);
             }
         }
     }
 
-    boolean cekData(){
-        if (namaLengkapField.getText() == null || tempatLahirField.getText() == null || tanggalLahirPicker.getValue() == null || jenisKelaminChoice.getValue() == null || agamaChoice.getValue() == null || alamatField.getText() == null){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Data Belum Terisi");
-            alert.setContentText("Data tidak dapat dimasukan karena belum terisi.");
-            alert.showAndWait();
-            return false;
+    private String generateNewNis(Connection conn) throws SQLException {
+        String lastNisSql = "SELECT nomor_induk_siswa FROM siswa WHERE nomor_induk_siswa LIKE 'SD%' ORDER BY CAST(SUBSTRING(nomor_induk_siswa, 3) AS INTEGER) DESC LIMIT 1";
+        PreparedStatement pstmt = conn.prepareStatement(lastNisSql);
+        ResultSet rs = pstmt.executeQuery();
+        int nextNumber = 1;
+        if (rs.next()) {
+            int lastNumber = Integer.parseInt(rs.getString("nomor_induk_siswa").substring(2));
+            nextNumber = lastNumber + 1;
         }
-        try(Connection data = MainDataSource.getConnection()){
-            PreparedStatement stmt = data.prepareStatement("SELECT * FROM siswa WHERE nama_siswa = ? AND tanggal_lahir_siswa = ? AND gender_siswa = ? AND agama = ? AND golongan_darah = ? AND UPPER(tempat_lahir_siswa) = ?");
-            stmt.setString(1, namaLengkapField.getText());
-            stmt.setDate(2, Date.valueOf(tanggalLahirPicker.getValue()));
-            stmt.setString(3, jenisKelaminChoice.getValue());
-            stmt.setString(4, agamaChoice.getValue());
-            stmt.setString(5, golonganDarahChoice.getValue());
-            stmt.setString(6,tempatLahirField.getText().toUpperCase());
+        return String.format("SD%03d", nextNumber);
+    }
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Siswa Exist");
-                alert.setContentText("Data tidak dapat dimasukan karena nama, tempat/tanggal lahir, kelamin, agama dan golongan darah siswa sudah ada");
-                alert.showAndWait();
-                return false;
-            }
-        }catch (SQLException e){
-            System.out.println("Error: "+e);
+    private String generateNewPassword(Connection conn) throws SQLException {
+        String lastPassSql = "SELECT password FROM users WHERE password LIKE 'sp%' ORDER BY CAST(SUBSTRING(password, 3) AS INTEGER) DESC LIMIT 1";
+        PreparedStatement pstmt = conn.prepareStatement(lastPassSql);
+        ResultSet rs = pstmt.executeQuery();
+        int nextNumber = 1;
+        if (rs.next()) {
+            int lastNumber = Integer.parseInt(rs.getString("password").substring(2));
+            nextNumber = lastNumber + 1;
+        }
+        return String.format("sp%03d", nextNumber);
+    }
+
+    boolean cekInputValid(){
+        if (namaLengkapField.getText() == null || namaLengkapField.getText().isEmpty() ||
+                tempatLahirField.getText() == null || tempatLahirField.getText().isEmpty() ||
+                tanggalLahirPicker.getValue() == null ||
+                jenisKelaminChoice.getValue() == null ||
+                agamaChoice.getValue() == null ||
+                alamatField.getText() == null || alamatField.getText().isEmpty()) {
+
+            showAlert(Alert.AlertType.WARNING, "Input Tidak Lengkap", "Harap isi semua field yang bertanda *.");
             return false;
         }
         return true;
@@ -140,7 +164,6 @@ public class InputDataSiswaController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin View");
-
             FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
             Parent root = loader.load();
             AdminViewController adminController = loader.getController();
@@ -150,5 +173,13 @@ public class InputDataSiswaController {
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
