@@ -20,11 +20,34 @@ public class DeleteUserMenuController {
 
     @FXML
     void onDeleteSiswaClicked() {
-
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Hapus Data Siswa");
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteSiswa.fxml"));
+            Parent root = loader.load();
+            DeleteSiswaController controller = loader.getController();
+            controller.setUser(user);
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
     void onDeleteGuruClicked() {
+        try {
+            MainMenu app = MainMenu.getApplicationInstance();
+            app.getPrimaryStage().setTitle("Hapus Data Guru");
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteGuru.fxml"));
+            Parent root = loader.load();
+            DeleteGuruController controller = loader.getController();
+            controller.setUser(user);
+            Scene scene = new Scene(root);
+            app.getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
