@@ -124,17 +124,17 @@ public class LoginController {
                 String title = "";
 
                 if (role.equals("Admin")) {
-                    fxmlFile = "admin-view.fxml";
+                    fxmlFile = "fxml/admin/admin-view.fxml";
                     title = "Admin Dashboard";
                 } else if (role.equals("Siswa")) {
-                    fxmlFile = "siswa-view.fxml";
+                    fxmlFile = "fxml/siswa/siswa-view.fxml";
                     title = "Siswa Dashboard";
                 } else if (role.equals("Guru")) {
                     if (wakiKelas) {
-                        fxmlFile = "guru-walikelasView.fxml";
+                        fxmlFile = "fxml/guru/guru-walikelasView.fxml";
                         title = "Wali Kelas Dashboard";
                     } else {
-                        fxmlFile = "guru-view.fxml";
+                        fxmlFile = "fxml/guru/guru-view.fxml";
                         title = "Guru Dashboard";
                     }
                 }

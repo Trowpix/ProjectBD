@@ -23,7 +23,7 @@ public class DeleteUserMenuController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Hapus Data Siswa");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteSiswa.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-deleteSiswa.fxml"));
             Parent root = loader.load();
             DeleteSiswaController controller = loader.getController();
             controller.setUser(user);
@@ -39,7 +39,7 @@ public class DeleteUserMenuController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Hapus Data Guru");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteGuru.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-deleteGuru.fxml"));
             Parent root = loader.load();
             DeleteGuruController controller = loader.getController();
             controller.setUser(user);
@@ -55,7 +55,7 @@ public class DeleteUserMenuController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Admin Dashboard");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-view.fxml"));
             Parent root = loader.load();
             AdminViewController controller = loader.getController();
             controller.setUser(user);

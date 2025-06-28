@@ -186,7 +186,7 @@ public class InputNilaiController {
             try {
                 MainMenu app = MainMenu.getApplicationInstance();
                 app.getPrimaryStage().setTitle("Tampilan Siswa");
-                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-inputTampilkanSiswa.fxml"));
+                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-inputTampilkanSiswa.fxml"));
                 Parent root = loader.load();
                 InputTampilkanSiswa inputTampilkanSiswa = loader.getController();
                 inputTampilkanSiswa.setUser(user);
@@ -213,7 +213,7 @@ public class InputNilaiController {
             MainMenu app = MainMenu.getApplicationInstance();
             if (user.role.equals("Wali Kelas")) {
                 app.getPrimaryStage().setTitle("Wali Kelas View");
-                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-walikelasView.fxml"));
+                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-walikelasView.fxml"));
                 Parent root = loader.load();
                 WaliKelasViewController waliKelasController = loader.getController();
                 waliKelasController.setUser(user);
@@ -221,7 +221,7 @@ public class InputNilaiController {
                 app.getPrimaryStage().setScene(scene);
             } else {
                 app.getPrimaryStage().setTitle("Guru View");
-                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-view.fxml"));
+                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-view.fxml"));
                 Parent root = loader.load();
                 GuruViewController guruController = loader.getController();
                 guruController.setUser(user);

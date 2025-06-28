@@ -74,7 +74,7 @@ public class SiswaEkstrakurikulerController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Dashboard Siswa");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-view.fxml"));
             Parent root = loader.load();
 
             SiswaViewController controller = loader.getController();

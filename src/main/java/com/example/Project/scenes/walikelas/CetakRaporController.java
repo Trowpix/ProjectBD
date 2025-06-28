@@ -153,7 +153,7 @@ public class CetakRaporController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Wali Kelas View");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-walikelasView.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-walikelasView.fxml"));
             Parent root = loader.load();
             WaliKelasViewController controller = loader.getController();
             controller.setUser(user);

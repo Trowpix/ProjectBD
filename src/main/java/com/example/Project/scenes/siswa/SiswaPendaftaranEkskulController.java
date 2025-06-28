@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class SiswaPendaftaranEkskulController {
@@ -42,8 +43,9 @@ public class SiswaPendaftaranEkskulController {
 
     private void loadData() {
         if (user == null || user.id == null) return;
+        eskulList.clear();
+        eskulTerdaftarIds.clear();
 
-        // 1. Dapatkan semua ID eskul yang sudah diikuti siswa
         try (Connection conn = MainDataSource.getConnection()) {
             String checkSql = "SELECT id_ekskul FROM siswa_ekstrakurikuler WHERE nomor_induk_siswa = ?";
             PreparedStatement checkStmt = conn.prepareStatement(checkSql);
@@ -53,18 +55,19 @@ public class SiswaPendaftaranEkskulController {
                 eskulTerdaftarIds.add(rsCheck.getString("id_ekskul"));
             }
 
-            // 2. Dapatkan semua eskul yang tersedia dari tabel utama
-            String getSql = "SELECT id_ekskul, nama_ekskul, jadwal, nama_pembina FROM ekstrakurikuler";
+            String getSql = "SELECT e.id_ekskul, e.nama_ekskul, e.jadwal, g.nama_guru " +
+                    "FROM ekstrakurikuler e " +
+                    "LEFT JOIN guru g ON e.nip_pembina = g.nip";
             PreparedStatement getStmt = conn.prepareStatement(getSql);
             ResultSet rsGet = getStmt.executeQuery();
+
             while (rsGet.next()) {
                 Ekstrakurikuler eskul = new Ekstrakurikuler(
                         rsGet.getString("id_ekskul"),
                         rsGet.getString("nama_ekskul"),
                         rsGet.getString("jadwal"),
-                        rsGet.getString("nama_pembina")
+                        rsGet.getString("nama_guru")
                 );
-                // 3. Tandai eskul jika ID-nya ada di daftar yang sudah diikuti
                 if (eskulTerdaftarIds.contains(eskul.getId())) {
                     eskul.setTerdaftar(true);
                 }
@@ -91,7 +94,11 @@ public class SiswaPendaftaranEkskulController {
                 {
                     btn.setOnAction(event -> {
                         Ekstrakurikuler eskul = getTableView().getItems().get(getIndex());
-                        daftarEskul(eskul);
+                        if (eskul.isTerdaftar()) {
+                            batalDaftarEskul(eskul);
+                        } else {
+                            daftarEskul(eskul);
+                        }
                     });
                 }
 
@@ -104,9 +111,13 @@ public class SiswaPendaftaranEkskulController {
                         Ekstrakurikuler eskul = getTableView().getItems().get(getIndex());
 
                         btn.textProperty().bind(Bindings.when(eskul.terdaftarProperty())
-                                .then("Terdaftar")
+                                .then("Batal Daftar")
                                 .otherwise("Daftar"));
-                        btn.disableProperty().bind(eskul.terdaftarProperty());
+
+                        btn.styleProperty().bind(Bindings.when(eskul.terdaftarProperty())
+                                .then("-fx-background-color: #e74c3c; -fx-text-fill: white;")
+                                .otherwise("-fx-background-color: #27ae60; -fx-text-fill: white;"));
+
                         setGraphic(btn);
                     }
                 }
@@ -119,29 +130,43 @@ public class SiswaPendaftaranEkskulController {
         String sql = "INSERT INTO siswa_ekstrakurikuler (nomor_induk_siswa, id_ekskul) VALUES (?, ?)";
         try (Connection conn = MainDataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, user.id);
-
-            // PERBAIKAN: Mengubah String ID menjadi Integer sebelum dikirim ke database
             pstmt.setInt(2, Integer.parseInt(eskul.getId()));
-
             pstmt.executeUpdate();
 
-            // Update status di UI secara langsung
             eskul.setTerdaftar(true);
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Pendaftaran Berhasil");
-            alert.setHeaderText(null);
-            alert.setContentText("Kamu berhasil terdaftar di ekstrakurikuler " + eskul.getNama());
-            alert.showAndWait();
+            showAlert(Alert.AlertType.INFORMATION, "Pendaftaran Berhasil", "Kamu berhasil terdaftar di ekstrakurikuler " + eskul.getNama());
 
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Pendaftaran Gagal");
-            alert.setHeaderText(null);
-            alert.setContentText("Terjadi kesalahan saat mendaftar.");
-            alert.showAndWait();
+            showAlert(Alert.AlertType.ERROR, "Pendaftaran Gagal", "Terjadi kesalahan saat mendaftar.");
+        }
+    }
+
+    private void batalDaftarEskul(Ekstrakurikuler eskul) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Konfirmasi Pembatalan");
+        confirmation.setHeaderText("Anda yakin ingin batal mendaftar dari eskul '" + eskul.getNama() + "'?");
+        Optional<ButtonType> result = confirmation.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String sql = "DELETE FROM siswa_ekstrakurikuler WHERE nomor_induk_siswa = ? AND id_ekskul = ?";
+            try (Connection conn = MainDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setString(1, user.id);
+                pstmt.setInt(2, Integer.parseInt(eskul.getId()));
+                pstmt.executeUpdate();
+
+                eskul.setTerdaftar(false);
+                showAlert(Alert.AlertType.INFORMATION, "Pembatalan Berhasil", "Pendaftaran Anda di eskul " + eskul.getNama() + " telah dibatalkan.");
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Gagal", "Terjadi kesalahan saat membatalkan pendaftaran.");
+            }
         }
     }
 
@@ -150,7 +175,7 @@ public class SiswaPendaftaranEkskulController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Dashboard Siswa");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-view.fxml"));
             Parent root = loader.load();
             SiswaViewController controller = loader.getController();
             controller.setUser(this.user);
@@ -159,5 +184,13 @@ public class SiswaPendaftaranEkskulController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

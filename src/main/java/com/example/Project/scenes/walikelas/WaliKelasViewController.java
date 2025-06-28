@@ -51,7 +51,7 @@ public class WaliKelasViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Jadwal Kelas");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-jadwalKelas.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-jadwalKelas.fxml"));
             Parent root = loader.load();
 
             JadwalKelasController jadwalKelasController = loader.getController();
@@ -69,7 +69,7 @@ public class WaliKelasViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Nilai");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-inputNilai.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-inputNilai.fxml"));
             Parent root = loader.load();
 
             InputNilaiController inputNilaiController = loader.getController();
@@ -88,7 +88,7 @@ public class WaliKelasViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Cetak Rapor");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-walikelasCetakRapor.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-walikelasCetakRapor.fxml"));
             Parent root = loader.load();
 
             CetakRaporController cetakRaporController = loader.getController();
@@ -123,7 +123,7 @@ public class WaliKelasViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Absensi Siswa");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-absensi.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-absensi.fxml"));
             Parent root = loader.load();
 
             GuruAbsensiController guruAbsensiController = loader.getController();

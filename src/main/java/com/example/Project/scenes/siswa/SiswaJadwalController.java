@@ -114,7 +114,7 @@ public class SiswaJadwalController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Siswa View");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-view.fxml"));
             Parent root = loader.load();
             SiswaViewController siswaViewController = loader.getController();
             siswaViewController.setUser(user);

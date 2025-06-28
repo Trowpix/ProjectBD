@@ -52,7 +52,7 @@ public class SiswaViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Siswa Biodata");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-biodata.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-biodata.fxml"));
             Parent root = loader.load();
             SiswaBiodataController siswaBiodataController = loader.getController();
             siswaBiodataController.setUser(user);
@@ -68,7 +68,7 @@ public class SiswaViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Siswa Schedule");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-jadwal.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-jadwal.fxml"));
             Parent root = loader.load();
             SiswaJadwalController siswaJadwalController = loader.getController();
             siswaJadwalController.setUser(user);
@@ -84,7 +84,7 @@ public class SiswaViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Siswa Grade");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-grade.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-grade.fxml"));
             Parent root = loader.load();
             SiswaGradeController siswaGradeController = loader.getController();
             siswaGradeController.setUser(user );
@@ -101,7 +101,7 @@ public class SiswaViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Pendaftaran Ekstrakurikuler");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-pendaftaran-eskul.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-pendaftaran-eskul.fxml"));
             Parent root = loader.load();
 
             SiswaPendaftaranEkskulController controller = loader.getController();
@@ -121,7 +121,7 @@ public class SiswaViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Riwayat Absensi");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-absensi.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-absensi.fxml"));
             Parent root = loader.load();
 
             SiswaAbsensiController controller = loader.getController();

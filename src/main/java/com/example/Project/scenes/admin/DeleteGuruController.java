@@ -120,7 +120,7 @@ public class DeleteGuruController {
     void onKembaliClicked() {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteUser-menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-deleteUser-menu.fxml"));
             Parent root = loader.load();
             DeleteUserMenuController controller = loader.getController();
             controller.setUser(user);

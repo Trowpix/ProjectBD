@@ -81,7 +81,7 @@ public class SiswaAbsensiController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Siswa View");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("siswa-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/siswa/siswa-view.fxml"));
             Parent root = loader.load();
             SiswaViewController controller = loader.getController();
             controller.setUser(user);

@@ -52,7 +52,7 @@ public class AdminViewController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Data Siswa");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputDataSiswa.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-inputDataSiswa.fxml"));
             Parent root = loader.load();
             InputDataSiswaController inputDataSiswaController = loader.getController();
             inputDataSiswaController.setUser(user);
@@ -68,7 +68,7 @@ public class AdminViewController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Data Guru");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputDataGuru.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-inputDataGuru.fxml"));
             Parent root = loader.load();
             InputDataGuruController controller = loader.getController();
             controller.setUser(user);
@@ -84,7 +84,7 @@ public class AdminViewController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Jadwal Kelas");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-inputJadwalKelas.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-inputJadwalKelas.fxml"));
             Parent root = loader.load();
             InputJadwalKelasController inputJadwalKelasController = loader.getController();
             inputJadwalKelasController.setUser(user);
@@ -100,7 +100,7 @@ public class AdminViewController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Pembagian Kelas");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-membagiKelas.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-membagiKelas.fxml"));
             Parent root = loader.load();
             MembagiKelasController membagiKelasController = loader.getController();
             membagiKelasController.setUser(user);
@@ -117,7 +117,7 @@ public class AdminViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Hapus Pengguna");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("admin-deleteUser-menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/admin/admin-deleteUser-menu.fxml"));
             Parent root = loader.load();
 
             DeleteUserMenuController controller = loader.getController();

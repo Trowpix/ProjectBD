@@ -88,7 +88,7 @@ public class InputTampilkanSiswa {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Nilai");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-inputNilai.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-inputNilai.fxml"));
             Parent root = loader.load();
 
             InputNilaiController inputNilaiController = loader.getController();

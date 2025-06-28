@@ -237,7 +237,7 @@ public class GuruAbsensiController {
             MainMenu app = MainMenu.getApplicationInstance();
             if ("Wali Kelas".equals(user.role)) {
                 app.getPrimaryStage().setTitle("Wali Kelas View");
-                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-walikelasView.fxml"));
+                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-walikelasView.fxml"));
                 Parent root = loader.load();
                 WaliKelasViewController waliKelasController = loader.getController();
                 waliKelasController.setUser(user);
@@ -245,7 +245,7 @@ public class GuruAbsensiController {
                 app.getPrimaryStage().setScene(scene);
             } else {
                 app.getPrimaryStage().setTitle("Guru View");
-                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-view.fxml"));
+                FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-view.fxml"));
                 Parent root = loader.load();
                 GuruViewController guruController = loader.getController();
                 guruController.setUser(user);

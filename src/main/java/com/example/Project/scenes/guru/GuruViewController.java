@@ -52,7 +52,7 @@ public class GuruViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Jadwal Kelas");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-jadwalKelas.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-jadwalKelas.fxml"));
             Parent root = loader.load();
 
             JadwalKelasController jadwalKelasController = loader.getController();
@@ -70,7 +70,7 @@ public class GuruViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Input Nilai");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-inputNilai.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-inputNilai.fxml"));
             Parent root = loader.load();
 
             InputNilaiController inputNilaiController = loader.getController();
@@ -105,7 +105,7 @@ public class GuruViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Absensi Siswa");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-absensi.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-absensi.fxml"));
             Parent root = loader.load();
 
             GuruAbsensiController guruAbsensiController = loader.getController();
@@ -124,7 +124,7 @@ public class GuruViewController {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Manajemen Ekstrakurikuler");
 
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-manajemen-ekskul.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-manajemen-ekskul.fxml"));
             Parent root = loader.load();
 
             // Kirim data user (jika diperlukan)

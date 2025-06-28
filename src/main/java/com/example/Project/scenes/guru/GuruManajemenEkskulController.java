@@ -17,9 +17,12 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class GuruManajemenEkskulController {
@@ -27,13 +30,10 @@ public class GuruManajemenEkskulController {
     @FXML private TableView<Ekstrakurikuler> tableViewEskul;
     @FXML private TableColumn<Ekstrakurikuler, String> kolomNama;
     @FXML private TableColumn<Ekstrakurikuler, String> kolomJadwal;
-    @FXML private TableColumn<Ekstrakurikuler, String> kolomPembina;
     @FXML private TableColumn<Ekstrakurikuler, Void> kolomAksi;
-
     @FXML private Label formLabel;
     @FXML private TextField fieldNama;
-    @FXML private TextField fieldJadwal;
-    @FXML private TextField fieldPembina;
+    @FXML private DatePicker datePickerJadwal;
     @FXML private Button tombolSimpan;
     @FXML private Button tombolBatal;
 
@@ -43,31 +43,38 @@ public class GuruManajemenEkskulController {
 
     public void setUser(User user) {
         this.user = user;
+        loadData();
     }
 
     @FXML
     public void initialize() {
         kolomNama.setCellValueFactory(new PropertyValueFactory<>("nama"));
         kolomJadwal.setCellValueFactory(new PropertyValueFactory<>("jadwal"));
-        kolomPembina.setCellValueFactory(new PropertyValueFactory<>("pembina"));
         addAksiButtonsToTable();
-        loadData();
         resetForm();
     }
 
     private void loadData() {
+        if (user == null || user.id == null) return;
         eskulList.clear();
-        String sql = "SELECT id_ekskul, nama_ekskul, jadwal, nama_pembina FROM ekstrakurikuler";
+        String sql = "SELECT id_ekskul, nama_ekskul, jadwal FROM ekstrakurikuler WHERE nip_pembina = ?";
         try (Connection conn = MainDataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user.id);
+            ResultSet rs = pstmt.executeQuery();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 
             while (rs.next()) {
+                Date dbDate = rs.getDate("jadwal");
+                String formattedDate = (dbDate != null) ? dbDate.toLocalDate().format(formatter) : "Belum diatur";
+
                 eskulList.add(new Ekstrakurikuler(
                         rs.getString("id_ekskul"),
                         rs.getString("nama_ekskul"),
-                        rs.getString("jadwal"),
-                        rs.getString("nama_pembina")
+                        formattedDate,
+                        user.username
                 ));
             }
         } catch (SQLException e) {
@@ -97,11 +104,7 @@ public class GuruManajemenEkskulController {
                 @Override
                 protected void updateItem(Void item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty) {
-                        setGraphic(null);
-                    } else {
-                        setGraphic(pane);
-                    }
+                    setGraphic(empty ? null : pane);
                 }
             };
         };
@@ -110,6 +113,11 @@ public class GuruManajemenEkskulController {
 
     @FXML
     void onSimpanClicked() {
+        if (fieldNama.getText().isEmpty() || datePickerJadwal.getValue() == null) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Nama Ekstrakurikuler dan Jadwal harus diisi.");
+            return;
+        }
+
         if (eskulTerpilih == null) {
             tambahEskul();
         } else {
@@ -117,18 +125,13 @@ public class GuruManajemenEkskulController {
         }
     }
 
-    @FXML
-    void onBatalClicked() {
-        resetForm();
-    }
-
     private void tambahEskul() {
-        String sql = "INSERT INTO ekstrakurikuler (nama_ekskul, jadwal, nama_pembina) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO ekstrakurikuler (nama_ekskul, jadwal, nip_pembina) VALUES (?, ?, ?)";
         try (Connection conn = MainDataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, fieldNama.getText());
-            pstmt.setString(2, fieldJadwal.getText());
-            pstmt.setString(3, fieldPembina.getText());
+            pstmt.setDate(2, Date.valueOf(datePickerJadwal.getValue()));
+            pstmt.setString(3, user.id);
             pstmt.executeUpdate();
             loadData();
             resetForm();
@@ -138,16 +141,12 @@ public class GuruManajemenEkskulController {
     }
 
     private void updateEskul() {
-        String sql = "UPDATE ekstrakurikuler SET nama_ekskul = ?, jadwal = ?, nama_pembina = ? WHERE id_ekskul = ?";
+        String sql = "UPDATE ekstrakurikuler SET nama_ekskul = ?, jadwal = ? WHERE id_ekskul = ?";
         try (Connection conn = MainDataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, fieldNama.getText());
-            pstmt.setString(2, fieldJadwal.getText());
-            pstmt.setString(3, fieldPembina.getText());
-
-            // PERBAIKAN: Mengubah String ID menjadi Integer sebelum dikirim ke database
-            pstmt.setInt(4, Integer.parseInt(eskulTerpilih.getId()));
-
+            pstmt.setDate(2, Date.valueOf(datePickerJadwal.getValue()));
+            pstmt.setInt(3, Integer.parseInt(eskulTerpilih.getId()));
             pstmt.executeUpdate();
             loadData();
             resetForm();
@@ -160,21 +159,35 @@ public class GuruManajemenEkskulController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Konfirmasi Hapus");
         alert.setHeaderText("Anda yakin ingin menghapus eskul: " + eskul.getNama() + "?");
-        alert.setContentText("Tindakan ini akan menghapus semua data pendaftaran siswa pada eskul ini.");
+        alert.setContentText("Tindakan ini juga akan menghapus data pendaftaran siswa pada eskul ini.");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            String sql = "DELETE FROM ekstrakurikuler WHERE id_ekskul = ?";
-            try (Connection conn = MainDataSource.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            String deletePendaftaranSql = "DELETE FROM siswa_ekstrakurikuler WHERE id_ekskul = ?";
+            String deleteEskulSql = "DELETE FROM ekstrakurikuler WHERE id_ekskul = ?";
 
-                // PERBAIKAN: Mengubah String ID menjadi Integer sebelum dikirim ke database
-                pstmt.setInt(1, Integer.parseInt(eskul.getId()));
+            Connection conn = null;
+            try {
+                conn = MainDataSource.getConnection();
+                conn.setAutoCommit(false);
 
-                pstmt.executeUpdate();
+                try(PreparedStatement pstmt1 = conn.prepareStatement(deletePendaftaranSql)){
+                    pstmt1.setInt(1, Integer.parseInt(eskul.getId()));
+                    pstmt1.executeUpdate();
+                }
+
+                try(PreparedStatement pstmt2 = conn.prepareStatement(deleteEskulSql)){
+                    pstmt2.setInt(1, Integer.parseInt(eskul.getId()));
+                    pstmt2.executeUpdate();
+                }
+
+                conn.commit();
                 loadData();
             } catch (SQLException e) {
+                if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
                 e.printStackTrace();
+            } finally {
+                if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
             }
         }
     }
@@ -182,17 +195,28 @@ public class GuruManajemenEkskulController {
     private void siapkanFormEdit() {
         formLabel.setText("Edit Ekstrakurikuler");
         fieldNama.setText(eskulTerpilih.getNama());
-        fieldJadwal.setText(eskulTerpilih.getJadwal());
-        fieldPembina.setText(eskulTerpilih.getPembina());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        try {
+            LocalDate date = LocalDate.parse(eskulTerpilih.getJadwal(), formatter);
+            datePickerJadwal.setValue(date);
+        } catch (Exception e) {
+            datePickerJadwal.setValue(null);
+        }
+
         tombolBatal.setVisible(true);
+    }
+
+    @FXML
+    void onBatalClicked() {
+        resetForm();
     }
 
     private void resetForm() {
         eskulTerpilih = null;
         formLabel.setText("Tambah Ekstrakurikuler Baru");
         fieldNama.clear();
-        fieldJadwal.clear();
-        fieldPembina.clear();
+        datePickerJadwal.setValue(null);
         tombolBatal.setVisible(false);
     }
 
@@ -201,7 +225,7 @@ public class GuruManajemenEkskulController {
         try {
             MainMenu app = MainMenu.getApplicationInstance();
             app.getPrimaryStage().setTitle("Dashboard Guru");
-            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("guru-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainMenu.class.getResource("fxml/guru/guru-view.fxml"));
             Parent root = loader.load();
             GuruViewController controller = loader.getController();
             controller.setUser(this.user);
@@ -210,5 +234,13 @@ public class GuruManajemenEkskulController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
