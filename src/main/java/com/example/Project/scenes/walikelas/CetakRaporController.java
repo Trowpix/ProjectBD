@@ -4,6 +4,14 @@ import com.example.Project.MainMenu;
 import com.example.Project.datasources.MainDataSource;
 import com.example.Project.dtos.TableViewGrade;
 import com.example.Project.dtos.User;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,12 +24,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class CetakRaporController {
     @FXML private Label nilaiAkhirLabel;
@@ -61,8 +74,7 @@ public class CetakRaporController {
         semesterComboBox.getItems().addAll("1", "2");
         semesterComboBox.setValue("1");
 
-        // Contoh data untuk tahun ajaran, karena tidak ada sumber data yang pasti
-        tahunAjaranComboBox.getItems().addAll("2024/2025", "2025/2026");
+        tahunAjaranComboBox.getItems().addAll("2024/2025", "2025/2026", "2026/2027");
         tahunAjaranComboBox.setValue("2024/2025");
 
         try (Connection conn = MainDataSource.getConnection()) {
@@ -116,7 +128,7 @@ public class CetakRaporController {
                 String mapel = rs.getString("nama_mata_pelajaran");
                 double uts = rs.getDouble("uts");
                 double uas = rs.getDouble("uas");
-                double rataRata = (uts + uas) / 2;
+                double rataRata = (uts + uas) / 2.0;
                 grades.add(new TableViewGrade(mapel, uts, uas, rataRata));
                 totalNilaiRataRata += rataRata;
                 jumlahMapel++;
@@ -145,7 +157,75 @@ public class CetakRaporController {
 
     @FXML
     void onCetakPdfClicked() {
-        showAlert(Alert.AlertType.INFORMATION, "Fitur Dalam Pengembangan", "Fungsionalitas untuk mencetak ke PDF memerlukan library tambahan dan saat ini sedang dalam pengembangan.");
+        if (raporTable.getItems().isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Data Kosong", "Generate rapor terlebih dahulu sebelum mencetak.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Rapor PDF");
+        String initialFileName = String.format("Rapor_%s_%s.pdf", namaSiswaLabel.getText().replace(" ", "_"), kelasLabel.getText().replace("Kelas: ", "").trim());
+        fileChooser.setInitialFileName(initialFileName);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+        File file = fileChooser.showSaveDialog(raporTable.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                createPdf(file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Berhasil", "File PDF berhasil disimpan di:\n" + file.getAbsolutePath());
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Gagal", "Terjadi error saat membuat file PDF.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void createPdf(String dest) throws IOException {
+        PdfWriter writer = new PdfWriter(dest);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        document.add(new Paragraph("RAPOR SISWA").setTextAlignment(TextAlignment.CENTER).setFontSize(20).setBold());
+        document.add(new Paragraph("TAHUN AJARAN " + tahunAjaranComboBox.getValue()).setTextAlignment(TextAlignment.CENTER).setFontSize(14));
+        document.add(new Paragraph("\n"));
+
+        document.add(new Paragraph("Nama Siswa\t: " + namaSiswaLabel.getText()));
+        document.add(new Paragraph("Nomor Induk Siswa\t: " + siswaComboBox.getValue()));
+        document.add(new Paragraph(kelasLabel.getText()));
+        document.add(new Paragraph(waliLabel.getText()));
+        document.add(new Paragraph("Semester\t: " + semesterComboBox.getValue()));
+        document.add(new Paragraph("\n\n"));
+
+        Table table = new Table(UnitValue.createPercentArray(new float[]{1, 5, 2, 2, 2}));
+        table.setWidth(UnitValue.createPercentValue(100));
+
+        table.addHeaderCell(new Cell().add(new Paragraph("No.").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Mata Pelajaran").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Nilai UTS").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Nilai UAS").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Rata-rata").setBold()));
+
+        int counter = 1;
+        for (TableViewGrade grade : raporTable.getItems()) {
+            table.addCell(String.valueOf(counter++));
+            table.addCell(grade.getMapelName());
+            table.addCell(String.valueOf(grade.getUtsValue()));
+            table.addCell(String.valueOf(grade.getUasValue()));
+            table.addCell(String.format("%.2f", grade.getRataRataValue()));
+        }
+        document.add(table);
+
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("Nilai Akhir Rata-rata: " + nilaiAkhirLabel.getText()).setFontSize(14).setBold().setTextAlignment(TextAlignment.RIGHT));
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd MMMM yyyy", new Locale("id", "ID"));
+        String formattedDate = LocalDate.now().format(dtf);
+        document.add(new Paragraph("\n\nSurabaya, " + formattedDate).setTextAlignment(TextAlignment.RIGHT));
+        document.add(new Paragraph("\n\n\n\n"));
+        document.add(new Paragraph(user.username).setTextAlignment(TextAlignment.RIGHT));
+
+        document.close();
     }
 
     @FXML

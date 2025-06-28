@@ -5,6 +5,8 @@ module com.example.Project {
     requires java.sql;
     requires org.slf4j;
     requires jdk.compiler;
+    requires kernel;
+    requires layout;
 
 
     opens com.example.Project to javafx.fxml;
